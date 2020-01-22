@@ -12,6 +12,7 @@ using System.Drawing.Imaging;
 using System.IO;
 
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Runtime.WindowsRuntime.dll
+
 // C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.18362.0\Windows.winmd
 using Windows.Graphics.Imaging;
 using Windows.Media.Ocr;
@@ -23,9 +24,11 @@ namespace OCRTranslate
 {
     public partial class Form1 : Form
     {
-        private SoftwareBitmap m_softwareBitmap;
+        // private SoftwareBitmap m_softwareBitmap;
         private Bitmap m_bitmap;
-        private readonly List<Windows.Globalization.Language> m_listLanguage = OcrEngine.AvailableRecognizerLanguages.ToList();
+        private MemoryStream m_memoryStream;
+
+        private readonly List<Windows.Globalization.Language> m_ro_listLanguage = OcrEngine.AvailableRecognizerLanguages.ToList();
         private Windows.Globalization.Language m_language;
 
         private int m_iX1 = 0;
@@ -65,7 +68,7 @@ namespace OCRTranslate
                 {
                     for (int i = 0; i < OcrEngine.AvailableRecognizerLanguages.Count; i++)
                     {
-                        comboBox_Language.Items.Add(m_listLanguage[i].DisplayName);
+                        comboBox_Language.Items.Add(m_ro_listLanguage[i].DisplayName);
                     }
 
                     comboBox_Language.SelectedIndex = 0;
@@ -97,7 +100,8 @@ namespace OCRTranslate
         /// <returns></returns>
         private Stream ImageCapture()
         {
-            var memoryStream = new MemoryStream();
+            // MemoryStream memoryStream = new MemoryStream();
+            m_memoryStream = new MemoryStream();
 
             // m_bitmap = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
             m_bitmap = new Bitmap(m_iWidth, m_iHeight);
@@ -105,14 +109,14 @@ namespace OCRTranslate
             Graphics graphics = Graphics.FromImage(m_bitmap as Image);
             graphics.CopyFromScreen(m_iX1, m_iY1, 0, 0, m_bitmap.Size);
 
-            m_bitmap.Save(memoryStream, ImageFormat.Jpeg);
-            memoryStream.Position = 0;
+            m_bitmap.Save(m_memoryStream, ImageFormat.Jpeg);
+            m_memoryStream.Position = 0;
 
             // pictureBox_Extract.Width = m_iWidth;
             // pictureBox_Extract.Height = m_iHeight;
             pictureBox_Extract.Image = m_bitmap;
 
-            return memoryStream;
+            return m_memoryStream;
         }
 
         /// <summary>
@@ -122,24 +126,47 @@ namespace OCRTranslate
         /// <returns></returns>
         private async Task ImageToText(Stream stream)
         {
-            var bitmapDecoder = await BitmapDecoder.CreateAsync(stream.AsRandomAccessStream());
+            // HRRESULT
+            try
+            {
+                // 구성 요소 인식 문제
+                BitmapDecoder bitmapDecoder = await BitmapDecoder.CreateAsync(stream.AsRandomAccessStream());
 
-            m_softwareBitmap = await bitmapDecoder.GetSoftwareBitmapAsync();
+                // 이미지 헤더 인식 문제
+                SoftwareBitmap softwareBitmap = await bitmapDecoder.GetSoftwareBitmapAsync();
 
-            //// 이미지 해상도 지원 여부
-            //if (m_softwareBitmap.PixelWidth > OcrEngine.MaxImageDimension || m_softwareBitmap.PixelHeight > OcrEngine.MaxImageDimension)
-            //{
-            //    MessageBox.Show(string.Format("Bitmap dimensions are too big for OCR!\nMax image dimension is {0}!", OcrEngine.MaxImageDimension), "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //// 이미지 해상도 지원 여부
+                //if (m_softwareBitmap.PixelWidth > OcrEngine.MaxImageDimension || m_softwareBitmap.PixelHeight > OcrEngine.MaxImageDimension)
+                //{
+                //    MessageBox.Show(string.Format("Bitmap dimensions are too big for OCR!\nMax image dimension is {0}!", OcrEngine.MaxImageDimension), "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-            //    return;
-            //}
+                //    return;
+                //}
 
-            OcrEngine ocrEngine = checkBox_Language.Checked ? OcrEngine.TryCreateFromUserProfileLanguages() : ocrEngine = OcrEngine.TryCreateFromLanguage(m_language);
+                OcrEngine ocrEngine = checkBox_Language.Checked ? OcrEngine.TryCreateFromUserProfileLanguages() : ocrEngine = OcrEngine.TryCreateFromLanguage(m_language);
 
-            var ocrResult = await ocrEngine.RecognizeAsync(m_softwareBitmap).AsTask();
-            textBox_Extract.Text = ocrResult.Text;
+                var ocrResult = await ocrEngine.RecognizeAsync(softwareBitmap).AsTask();
+                string strtmp = ocrResult.Text;
 
-            await Translate();
+                // 이미지 데이터가 있는데도 결과 값이 없다면
+                if (m_bitmap != null && strtmp.Equals(""))
+                {
+                    label_ErrorExtract.Visible = true;
+                    textBox_Extract.Text = "";
+                }
+                else
+                {
+                    label_ErrorExtract.Visible = false;
+                    textBox_Extract.Text = strtmp;
+                }
+
+                await Translate();
+            }
+            catch (Exception)// ex)
+            {
+                textBox_Extract.Text = "";
+                label_ErrorExtract.Visible = true;
+            }
         }
 
         /// <summary>
@@ -148,7 +175,7 @@ namespace OCRTranslate
         /// <returns></returns>
         private async Task Translate()
         {
-            var translator = new GoogleTranslator();
+            GoogleTranslator translator = new GoogleTranslator();
 
             GoogleTranslateFreeApi.Language languageFrom = GoogleTranslateFreeApi.Language.Auto;
             // GoogleTranslateFreeApi.Language languageTo = GoogleTranslator.GetLanguageByName("Korean");
@@ -168,11 +195,13 @@ namespace OCRTranslate
                     strTranslate += (strtmp + "\n");
                 }
 
+                label_ErrorTranslate.Visible = false;
                 textBox_Translate.Text = strTranslate;
             }
             catch (Exception)// ex)
             {
-
+                label_ErrorTranslate.Visible = true;
+                textBox_Translate.Text = "";
             }
         }
 
@@ -208,11 +237,18 @@ namespace OCRTranslate
         }
 
         /// <summary>
-        /// Clear
+        /// Clear Result
         /// </summary>
-        private void ClearResult()
+        /// <param name="iFlag">
+        /// 0 : Ocr Language | 1 : Translate Language
+        /// </param>
+        private void ClearResult(int iFlag)
         {
-            textBox_Extract.Text = "";
+            if (iFlag == 0)
+            {
+                textBox_Extract.Text = "";
+            }
+
             textBox_Translate.Text = "";
         }
 
@@ -241,38 +277,54 @@ namespace OCRTranslate
 
         #region ComboBox
 
-        private void comboBox_Language_SelectedIndexChanged(object sender, EventArgs e)
+        private async void comboBox_Language_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ClearResult();
+            ClearResult(0);
 
-            m_language = new Windows.Globalization.Language(m_listLanguage[comboBox_Language.SelectedIndex].LanguageTag);
+            m_language = new Windows.Globalization.Language(m_ro_listLanguage[comboBox_Language.SelectedIndex].LanguageTag);
 
             if (!OcrEngine.IsLanguageSupported(m_language))
             {
                 MessageBox.Show(string.Format("'{0}' is not supported in this system!", m_language.DisplayName), "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            else
+            {
+                if (m_bitmap != null)
+                {
+                    await ImageToText(m_memoryStream);
+                }
+            }
         }
 
-        private void comboBox_LanguageTrans_SelectedIndexChanged(object sender, EventArgs e)
+        private async void comboBox_LanguageTrans_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ClearResult();
+            ClearResult(1);
+
+            if (m_bitmap != null)
+            {
+                await ImageToText(m_memoryStream);
+            }
         }
 
         #endregion
 
         #region CheckBox
 
-        private void checkBox_Language_CheckedChanged(object sender, EventArgs e)
+        private async void checkBox_Language_CheckedChanged(object sender, EventArgs e)
         {
-            ClearResult();
+            ClearResult(0);
 
             UpdateAvailableLanguages();
+
+            if (m_bitmap != null)
+            {
+                await ImageToText(m_memoryStream);
+            }
         }
 
         #endregion
 
         #endregion
-
 
     }
 }

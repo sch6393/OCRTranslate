@@ -21,37 +21,37 @@ namespace OCRTranslate
         public int Get_iX1
         {
             get;
-            set;
+            private set;
         }
 
         public int Get_iY1
         {
             get;
-            set;
+            private set;
         }
 
         public int Get_iX2
         {
             get;
-            set;
+            private set;
         }
 
         public int Get_iY2
         {
             get;
-            set;
+            private set;
         }
 
         public int Get_iWidth
         {
             get;
-            set;
+            private set;
         }
 
         public int Get_iHeight
         {
             get;
-            set;
+            private set;
         }
 
         #endregion

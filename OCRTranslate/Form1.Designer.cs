@@ -40,6 +40,8 @@
             this.textBox_Extract = new System.Windows.Forms.TextBox();
             this.groupBox_Translate = new System.Windows.Forms.GroupBox();
             this.textBox_Translate = new System.Windows.Forms.TextBox();
+            this.label_ErrorTranslate = new System.Windows.Forms.Label();
+            this.label_ErrorExtract = new System.Windows.Forms.Label();
             this.groupBox_Control.SuspendLayout();
             this.groupBox_Extract.SuspendLayout();
             this.panel.SuspendLayout();
@@ -57,7 +59,7 @@
             this.groupBox_Control.Location = new System.Drawing.Point(12, 12);
             this.groupBox_Control.Name = "groupBox_Control";
             this.groupBox_Control.Size = new System.Drawing.Size(364, 69);
-            this.groupBox_Control.TabIndex = 1;
+            this.groupBox_Control.TabIndex = 0;
             this.groupBox_Control.TabStop = false;
             this.groupBox_Control.Text = "Control";
             // 
@@ -99,9 +101,9 @@
             this.checkBox_Language.AutoSize = true;
             this.checkBox_Language.Location = new System.Drawing.Point(6, 20);
             this.checkBox_Language.Name = "checkBox_Language";
-            this.checkBox_Language.Size = new System.Drawing.Size(126, 16);
+            this.checkBox_Language.Size = new System.Drawing.Size(110, 16);
             this.checkBox_Language.TabIndex = 1;
-            this.checkBox_Language.Text = "USER LANGUAGE";
+            this.checkBox_Language.Text = "User Language";
             this.checkBox_Language.UseVisualStyleBackColor = true;
             this.checkBox_Language.CheckedChanged += new System.EventHandler(this.checkBox_Language_CheckedChanged);
             // 
@@ -117,6 +119,7 @@
             // 
             // groupBox_Extract
             // 
+            this.groupBox_Extract.Controls.Add(this.label_ErrorExtract);
             this.groupBox_Extract.Controls.Add(this.panel);
             this.groupBox_Extract.Controls.Add(this.textBox_Extract);
             this.groupBox_Extract.Location = new System.Drawing.Point(12, 189);
@@ -140,7 +143,7 @@
             this.pictureBox_Extract.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pictureBox_Extract.Location = new System.Drawing.Point(0, 0);
             this.pictureBox_Extract.Name = "pictureBox_Extract";
-            this.pictureBox_Extract.Size = new System.Drawing.Size(200, 200);
+            this.pictureBox_Extract.Size = new System.Drawing.Size(748, 258);
             this.pictureBox_Extract.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBox_Extract.TabIndex = 6;
             this.pictureBox_Extract.TabStop = false;
@@ -158,6 +161,7 @@
             // 
             // groupBox_Translate
             // 
+            this.groupBox_Translate.Controls.Add(this.label_ErrorTranslate);
             this.groupBox_Translate.Controls.Add(this.textBox_Translate);
             this.groupBox_Translate.Location = new System.Drawing.Point(12, 87);
             this.groupBox_Translate.Name = "groupBox_Translate";
@@ -177,6 +181,30 @@
             this.textBox_Translate.TabIndex = 5;
             this.textBox_Translate.TabStop = false;
             // 
+            // label_ErrorTranslate
+            // 
+            this.label_ErrorTranslate.AutoSize = true;
+            this.label_ErrorTranslate.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.label_ErrorTranslate.ForeColor = System.Drawing.Color.Red;
+            this.label_ErrorTranslate.Location = new System.Drawing.Point(63, 0);
+            this.label_ErrorTranslate.Name = "label_ErrorTranslate";
+            this.label_ErrorTranslate.Size = new System.Drawing.Size(42, 12);
+            this.label_ErrorTranslate.TabIndex = 0;
+            this.label_ErrorTranslate.Text = "Error!";
+            this.label_ErrorTranslate.Visible = false;
+            // 
+            // label_ErrorExtract
+            // 
+            this.label_ErrorExtract.AutoSize = true;
+            this.label_ErrorExtract.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.label_ErrorExtract.ForeColor = System.Drawing.Color.Red;
+            this.label_ErrorExtract.Location = new System.Drawing.Point(50, 0);
+            this.label_ErrorExtract.Name = "label_ErrorExtract";
+            this.label_ErrorExtract.Size = new System.Drawing.Size(42, 12);
+            this.label_ErrorExtract.TabIndex = 0;
+            this.label_ErrorExtract.Text = "Error!";
+            this.label_ErrorExtract.Visible = false;
+            // 
             // Form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -188,7 +216,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-            this.Text = "Form1";
+            this.Text = "OCR Translate";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox_Control.ResumeLayout(false);
             this.groupBox_Control.PerformLayout();
@@ -217,6 +245,8 @@
         private System.Windows.Forms.PictureBox pictureBox_Extract;
         private System.Windows.Forms.GroupBox groupBox_Translate;
         private System.Windows.Forms.TextBox textBox_Translate;
+        private System.Windows.Forms.Label label_ErrorExtract;
+        private System.Windows.Forms.Label label_ErrorTranslate;
     }
 }
 
