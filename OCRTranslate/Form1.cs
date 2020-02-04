@@ -38,6 +38,11 @@ namespace OCRTranslate
         private int m_iWidth = 0;
         private int m_iHeight = 0;
 
+        private string m_strExtractText = "";
+
+        // true : 최초 추출
+        private bool m_bExtractFlag = true;
+
         public Form1()
         {
             InitializeComponent();
@@ -55,6 +60,16 @@ namespace OCRTranslate
 
             // 번역 가능 List
             UpdateAvailableTranslate();
+        }
+
+        /// <summary>
+        /// Timer Tick (500ms)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void timer_Image_Tick(object sender, EventArgs e)
+        {
+            await ImageToText(ImageCapture());
         }
 
         #region Function
@@ -100,21 +115,28 @@ namespace OCRTranslate
         /// <returns></returns>
         private Stream ImageCapture()
         {
-            // MemoryStream memoryStream = new MemoryStream();
-            m_memoryStream = new MemoryStream();
+            try
+            {
+                // MemoryStream memoryStream = new MemoryStream();
+                m_memoryStream = new MemoryStream();
 
-            // m_bitmap = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
-            m_bitmap = new Bitmap(m_iWidth, m_iHeight);
+                // m_bitmap = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+                m_bitmap = new Bitmap(m_iWidth, m_iHeight);
 
-            Graphics graphics = Graphics.FromImage(m_bitmap as Image);
-            graphics.CopyFromScreen(m_iX1, m_iY1, 0, 0, m_bitmap.Size);
+                Graphics graphics = Graphics.FromImage(m_bitmap as Image);
+                graphics.CopyFromScreen(m_iX1, m_iY1, 0, 0, m_bitmap.Size);
 
-            m_bitmap.Save(m_memoryStream, ImageFormat.Jpeg);
-            m_memoryStream.Position = 0;
+                m_bitmap.Save(m_memoryStream, ImageFormat.Jpeg);
+                m_memoryStream.Position = 0;
 
-            // pictureBox_Extract.Width = m_iWidth;
-            // pictureBox_Extract.Height = m_iHeight;
-            pictureBox_Extract.Image = m_bitmap;
+                // pictureBox_Extract.Width = m_iWidth;
+                // pictureBox_Extract.Height = m_iHeight;
+                pictureBox_Extract.Image = m_bitmap;
+            }
+            catch (Exception)// ex)
+            {
+
+            }
 
             return m_memoryStream;
         }
@@ -144,23 +166,44 @@ namespace OCRTranslate
                 //}
 
                 OcrEngine ocrEngine = checkBox_Language.Checked ? OcrEngine.TryCreateFromUserProfileLanguages() : ocrEngine = OcrEngine.TryCreateFromLanguage(m_language);
-
-                var ocrResult = await ocrEngine.RecognizeAsync(softwareBitmap).AsTask();
+                OcrResult ocrResult = await ocrEngine.RecognizeAsync(softwareBitmap).AsTask();
                 string strtmp = ocrResult.Text;
+
+                // 일본어의 경우 글자 사이사이 공백이 들어가는 현상이 있음
+                if (comboBox_Language.SelectedIndex == 1)
+                {
+                    strtmp = ocrResult.Text.Replace(" ", "");
+                }
+
+                // true : 최초 추출
+                if (m_bExtractFlag)
+                {
+                    m_strExtractText = strtmp;
+                    m_bExtractFlag = false;
+                }
 
                 // 이미지 데이터가 있는데도 결과 값이 없다면
                 if (m_bitmap != null && strtmp.Equals(""))
                 {
                     label_ErrorExtract.Visible = true;
                     textBox_Extract.Text = "";
+                    m_strExtractText = "";
+
+                    return;
                 }
                 else
                 {
                     label_ErrorExtract.Visible = false;
                     textBox_Extract.Text = strtmp;
-                }
 
-                await Translate();
+                    // 추출된 텍스트가 전의 데이터와 같지 않을 때만 Translate
+                    if (!m_strExtractText.Equals(strtmp) || !timer_Image.Enabled)
+                    {
+                        await Translate();
+
+                        m_bExtractFlag = true;
+                    }
+                }
             }
             catch (Exception)// ex)
             {
@@ -271,6 +314,34 @@ namespace OCRTranslate
             m_iHeight = form2.Get_iHeight;
 
             await ImageToText(ImageCapture());
+        }
+
+        /// <summary>
+        /// Timer On/Off
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_TimerImage_Click(object sender, EventArgs e)
+        {
+            if (m_bitmap == null)
+            {
+                MessageBox.Show("Must Set Area!", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                // On -> Off
+                if (timer_Image.Enabled)
+                {
+                    button_TimerImage.Text = "Timer On";
+                    timer_Image.Stop();
+                }
+                // Off -> On
+                else
+                {
+                    button_TimerImage.Text = "Timer Off";
+                    timer_Image.Start();
+                }
+            }
         }
 
         #endregion

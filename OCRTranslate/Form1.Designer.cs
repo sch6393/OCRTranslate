@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.groupBox_Control = new System.Windows.Forms.GroupBox();
             this.label_Arrow = new System.Windows.Forms.Label();
             this.comboBox_LanguageTrans = new System.Windows.Forms.ComboBox();
@@ -35,13 +36,15 @@
             this.checkBox_Language = new System.Windows.Forms.CheckBox();
             this.comboBox_Language = new System.Windows.Forms.ComboBox();
             this.groupBox_Extract = new System.Windows.Forms.GroupBox();
+            this.label_ErrorExtract = new System.Windows.Forms.Label();
             this.panel = new System.Windows.Forms.Panel();
             this.pictureBox_Extract = new System.Windows.Forms.PictureBox();
             this.textBox_Extract = new System.Windows.Forms.TextBox();
             this.groupBox_Translate = new System.Windows.Forms.GroupBox();
-            this.textBox_Translate = new System.Windows.Forms.TextBox();
             this.label_ErrorTranslate = new System.Windows.Forms.Label();
-            this.label_ErrorExtract = new System.Windows.Forms.Label();
+            this.textBox_Translate = new System.Windows.Forms.TextBox();
+            this.timer_Image = new System.Windows.Forms.Timer(this.components);
+            this.button_TimerImage = new System.Windows.Forms.Button();
             this.groupBox_Control.SuspendLayout();
             this.groupBox_Extract.SuspendLayout();
             this.panel.SuspendLayout();
@@ -51,6 +54,7 @@
             // 
             // groupBox_Control
             // 
+            this.groupBox_Control.Controls.Add(this.button_TimerImage);
             this.groupBox_Control.Controls.Add(this.label_Arrow);
             this.groupBox_Control.Controls.Add(this.comboBox_LanguageTrans);
             this.groupBox_Control.Controls.Add(this.button_AreaSet);
@@ -58,7 +62,7 @@
             this.groupBox_Control.Controls.Add(this.comboBox_Language);
             this.groupBox_Control.Location = new System.Drawing.Point(12, 12);
             this.groupBox_Control.Name = "groupBox_Control";
-            this.groupBox_Control.Size = new System.Drawing.Size(364, 69);
+            this.groupBox_Control.Size = new System.Drawing.Size(445, 69);
             this.groupBox_Control.TabIndex = 0;
             this.groupBox_Control.TabStop = false;
             this.groupBox_Control.Text = "Control";
@@ -129,6 +133,18 @@
             this.groupBox_Extract.TabStop = false;
             this.groupBox_Extract.Text = "Extract";
             // 
+            // label_ErrorExtract
+            // 
+            this.label_ErrorExtract.AutoSize = true;
+            this.label_ErrorExtract.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.label_ErrorExtract.ForeColor = System.Drawing.Color.Red;
+            this.label_ErrorExtract.Location = new System.Drawing.Point(50, 0);
+            this.label_ErrorExtract.Name = "label_ErrorExtract";
+            this.label_ErrorExtract.Size = new System.Drawing.Size(42, 12);
+            this.label_ErrorExtract.TabIndex = 0;
+            this.label_ErrorExtract.Text = "Error!";
+            this.label_ErrorExtract.Visible = false;
+            // 
             // panel
             // 
             this.panel.AutoScroll = true;
@@ -170,17 +186,6 @@
             this.groupBox_Translate.TabStop = false;
             this.groupBox_Translate.Text = "Translate";
             // 
-            // textBox_Translate
-            // 
-            this.textBox_Translate.Location = new System.Drawing.Point(6, 20);
-            this.textBox_Translate.Multiline = true;
-            this.textBox_Translate.Name = "textBox_Translate";
-            this.textBox_Translate.ReadOnly = true;
-            this.textBox_Translate.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox_Translate.Size = new System.Drawing.Size(748, 70);
-            this.textBox_Translate.TabIndex = 5;
-            this.textBox_Translate.TabStop = false;
-            // 
             // label_ErrorTranslate
             // 
             this.label_ErrorTranslate.AutoSize = true;
@@ -193,17 +198,31 @@
             this.label_ErrorTranslate.Text = "Error!";
             this.label_ErrorTranslate.Visible = false;
             // 
-            // label_ErrorExtract
+            // textBox_Translate
             // 
-            this.label_ErrorExtract.AutoSize = true;
-            this.label_ErrorExtract.Font = new System.Drawing.Font("굴림", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.label_ErrorExtract.ForeColor = System.Drawing.Color.Red;
-            this.label_ErrorExtract.Location = new System.Drawing.Point(50, 0);
-            this.label_ErrorExtract.Name = "label_ErrorExtract";
-            this.label_ErrorExtract.Size = new System.Drawing.Size(42, 12);
-            this.label_ErrorExtract.TabIndex = 0;
-            this.label_ErrorExtract.Text = "Error!";
-            this.label_ErrorExtract.Visible = false;
+            this.textBox_Translate.Location = new System.Drawing.Point(6, 20);
+            this.textBox_Translate.Multiline = true;
+            this.textBox_Translate.Name = "textBox_Translate";
+            this.textBox_Translate.ReadOnly = true;
+            this.textBox_Translate.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBox_Translate.Size = new System.Drawing.Size(748, 70);
+            this.textBox_Translate.TabIndex = 5;
+            this.textBox_Translate.TabStop = false;
+            // 
+            // timer_Image
+            // 
+            this.timer_Image.Interval = 500;
+            this.timer_Image.Tick += new System.EventHandler(this.timer_Image_Tick);
+            // 
+            // button_TimerImage
+            // 
+            this.button_TimerImage.Location = new System.Drawing.Point(364, 40);
+            this.button_TimerImage.Name = "button_TimerImage";
+            this.button_TimerImage.Size = new System.Drawing.Size(75, 23);
+            this.button_TimerImage.TabIndex = 1;
+            this.button_TimerImage.Text = "Timer On";
+            this.button_TimerImage.UseVisualStyleBackColor = true;
+            this.button_TimerImage.Click += new System.EventHandler(this.button_TimerImage_Click);
             // 
             // Form1
             // 
@@ -247,6 +266,8 @@
         private System.Windows.Forms.TextBox textBox_Translate;
         private System.Windows.Forms.Label label_ErrorExtract;
         private System.Windows.Forms.Label label_ErrorTranslate;
+        private System.Windows.Forms.Timer timer_Image;
+        private System.Windows.Forms.Button button_TimerImage;
     }
 }
 
