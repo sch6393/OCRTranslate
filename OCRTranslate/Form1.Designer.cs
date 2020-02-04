@@ -219,7 +219,7 @@
             this.button_TimerImage.Location = new System.Drawing.Point(364, 40);
             this.button_TimerImage.Name = "button_TimerImage";
             this.button_TimerImage.Size = new System.Drawing.Size(75, 23);
-            this.button_TimerImage.TabIndex = 1;
+            this.button_TimerImage.TabIndex = 5;
             this.button_TimerImage.Text = "Timer On";
             this.button_TimerImage.UseVisualStyleBackColor = true;
             this.button_TimerImage.Click += new System.EventHandler(this.button_TimerImage_Click);

@@ -170,7 +170,7 @@ namespace OCRTranslate
                 string strtmp = ocrResult.Text;
 
                 // 일본어의 경우 글자 사이사이 공백이 들어가는 현상이 있음
-                if (comboBox_Language.SelectedIndex == 1)
+                if (m_language.LanguageTag == "ja")
                 {
                     strtmp = ocrResult.Text.Replace(" ", "");
                 }
